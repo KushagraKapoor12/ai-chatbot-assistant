@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>AI Chatbot Assistant</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="chat-container">
+
+<h1>AI Chatbot Assistant 🤖</h1>
+
+<div class="quick-buttons">
+
+<button onclick="quickQuestion('bus timings')">Bus Timings</button>
+<button onclick="quickQuestion('bus routes')">Routes</button>
+<button onclick="quickQuestion('ticket price')">Ticket Price</button>
+<button onclick="quickQuestion('student pass')">Student Pass</button>
+<button onclick="quickQuestion('apply bus pass')">Apply Pass</button>
+
+</div>
+
+<div id="chat-box"></div>
+
+<div class="input-area">
+
+<input id="user-input" type="text" placeholder="Ask me something..." />
+
+<button onclick="sendMessage()">Send</button>
+
+</div>
+
+</div>
+
+<script>
+
+function quickQuestion(text){
+
+document.getElementById("user-input").value=text;
+sendMessage();
+
+}
+
+function sendMessage(){
+
+let input=document.getElementById("user-input");
+let message=input.value;
+
+if(message==="") return;
+
+let chatBox=document.getElementById("chat-box");
+
+chatBox.innerHTML+=`<div class="user">${message}</div>`;
+
+input.value="";
+
+chatBox.innerHTML+=`<div class="bot typing">AI is typing...</div>`;
+
+chatBox.scrollTop=chatBox.scrollHeight;
+
+fetch("/chat",{
+
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({message:message})
+
+})
+.then(res=>res.json())
+.then(data=>{
+
+let typing=document.querySelector(".typing");
+typing.remove();
+
+chatBox.innerHTML+=`<div class="bot">${data.reply}</div>`;
+
+chatBox.scrollTop=chatBox.scrollHeight;
+
+});
+
+}
+
+document.getElementById("user-input")
+.addEventListener("keypress",function(event){
+
+if(event.key==="Enter"){
+
+event.preventDefault();
+sendMessage();
+
+}
+
+});
+
+</script>
+
+</body>
+
+</html>
